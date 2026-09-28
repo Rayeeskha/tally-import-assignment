@@ -1,0 +1,4 @@
+ALTER TABLE tally_imports
+  DROP PRIMARY KEY,
+  ADD COLUMN id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST,
+  ADD UNIQUE KEY uq_tally_import_import_id (import_id);

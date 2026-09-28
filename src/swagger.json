@@ -1,0 +1,230 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Tally XML Ingestion API",
+    "version": "1.0.0",
+    "description": "Safe, idempotent Tally XML normalization API."
+  },
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "Service is running"
+          }
+        }
+      }
+    },
+
+    "/api/auth/signin": {
+      "post": {
+        "summary": "Login user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+
+    "/api/tally/imports": {
+      "post": {
+        "summary": "Import Tally XML",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file"],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "New import completed"
+          },
+          "200": {
+            "description": "Exact bytes were already imported"
+          },
+          "400": {
+            "description": "Invalid or unsupported XML"
+          }
+        }
+      }
+    },
+
+    "/api/tally/imports/{importId}": {
+      "get": {
+        "summary": "Get import details",
+
+        "parameters": [
+          {
+            "name": "importId",
+            "in": "path",
+            "required": true,
+            "description": "Import ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+
+        "responses": {
+          "200": {
+            "description": "Import details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "importId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "fileName": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+
+          "404": {
+            "description": "Import not found"
+          }
+        }
+      }
+    },
+
+    "/api/tally/imports/{importId}/vouchers": {
+      "get": {
+        "summary": "Get normalized vouchers",
+
+        "parameters": [
+          {
+            "name": "importId",
+            "in": "path",
+            "required": true,
+            "description": "Import ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+
+        "responses": {
+          "200": {
+            "description": "Ordered normalized vouchers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+
+                  "required": ["items", "count"],
+
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "voucherNumber": {
+                            "type": "string"
+                          },
+                          "date": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "partyName": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    },
+
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+
+          "404": {
+            "description": "Import not found"
+          }
+        }
+      }
+    }
+  }
+}
