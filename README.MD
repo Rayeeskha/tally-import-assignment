@@ -77,8 +77,6 @@ SEED_ADMIN_PASSWORD=your-seed-password
 
 TALLY_MAX_UPLOAD_BYTES=10485760
 
-Do not commit .env or real credentials to the repository.
-
 Database Setup
 
 Create the configured MySQL database:
